@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import MCPServerAdapter
 from core.utils import get_groq_key
@@ -7,6 +8,14 @@ import time
 import litellm
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Add this before initializing MCPServerAdapter
 os.environ["MCP_AUTO_CONFIRM"] = "true"  # or whatever env var the adapter expects
 class RetryingLLM(LLM):
