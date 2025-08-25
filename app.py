@@ -7,7 +7,8 @@ import time
 import litellm
 
 app = FastAPI()
-
+# Add this before initializing MCPServerAdapter
+os.environ["MCP_AUTO_CONFIRM"] = "true"  # or whatever env var the adapter expects
 class RetryingLLM(LLM):
     def __init__(self, retries=5, backoff=2, **kwargs):
         super().__init__(**kwargs)
@@ -59,8 +60,17 @@ servers = [
 ]
 
 # Initialize tools globally
-agent_tools = MCPServerAdapter([servers[0]])
-agentic_tools = agent_tools.tools
+# agent_tools = MCPServerAdapter([servers[0]])
+# agentic_tools = agent_tools.tools
+
+
+try:
+    agent_tools = MCPServerAdapter([servers[0]])
+    agentic_tools = agent_tools.tools
+except Exception as e:
+    print(f"Failed to initialize MCPServerAdapter: {e}")
+    # Provide fallback tools or initialize with empty tools
+    agentic_tools = []
 
 # Create agents
 market_researcher = Agent(
